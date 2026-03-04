@@ -7,7 +7,9 @@
     import Country from '$lib/map/Country.svelte'
     import CountryHelper from '$lib/map/CountryHelper.svelte'
     import IslandHelper from '$lib/map/IslandHelper.svelte'
-    import {clientX, clientY, geojson, geometries, mousePos, noPanNoZoom, projection} from '$lib/store'
+    import {clientX, clientY, geojson, geometries, mousePos, noPanNoZoom, projection, showBorders} from '$lib/store'
+    import * as topojson from 'topojson-client';
+    import worldCountriesTopology from '$lib/assets/quests/world-countries/map.json';
 
     let transform = d3.zoomIdentity
     $: d3Svg && ($noPanNoZoom ? disableZoom() : enableZoom())
@@ -21,6 +23,7 @@
     let svg
     let d3Svg
     let scale = 1
+    let countryBorders =[];
 
     $: path = getPath(scale)
     $: strokeWidth = 0.002 * scale
@@ -50,7 +53,7 @@
     function centerMap() {
         scale = 0.95 / Math.max((bounds[1][0] - bounds[0][0]) / $clientX, (bounds[1][1] - bounds[0][1]) / $clientY)
         $projection.scale(scale).translate([($clientX - scale * (bounds[1][0] + bounds[0][0])) / 2, ($clientY - scale * (bounds[1][1] + bounds[0][1])) / 2])
-        path = getPath(scale) // It's important to reset the path, otherwise an height change such as full screen might screw up the map
+        path = getPath(scale) 
 
         if ($clientX < 800) d3Svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity)
     }
@@ -71,6 +74,15 @@
             enableZoom()
         }
 
+        // Decode the map safely in the browser to prevent crashing
+        try {
+            const topoTool = topojson.default || topojson;
+            const topoData = worldCountriesTopology.default || worldCountriesTopology;
+            countryBorders = topoTool.feature(topoData, topoData.objects.countries).features;
+        } catch (e) {
+            console.error("Could not load borders:", e);
+        }
+
         centerMap()
     })
 </script>
@@ -80,9 +92,23 @@
 <svg bind:this={svg} transition:fly|global={{y: 20, duration: 1500}} width={$clientX} height={$clientY} viewBox="0 0 {$clientX} {$clientY}">
     <g shape-rendering="auto" {transform}>
         {#each mapData as data}
-            <Country {data} {path} {...$$restProps} />
+            <Country {data} {path} {strokeWidth} {...$$restProps} />
         {/each}
-        {#each mapData as data}
+
+        {#if $showBorders}
+            {#each countryBorders as border} 
+                 <path 
+                    d={path(border)} 
+                    stroke="white" 
+                    stroke-width={strokeWidth*0.2} 
+                    fill="none" 
+                    opacity="1" 
+                    class="pointer-events-none"
+                 />
+            {/each}
+        {/if}
+
+               {#each mapData as data}
             {#if data[0]?.properties?.helper}
                 <CountryHelper {data} {path} {strokeWidth} {...$$restProps} />
             {:else if data[0]?.properties?.isIsland && data[0]?.properties?.squareKm < 30000}
