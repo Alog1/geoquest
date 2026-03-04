@@ -92,9 +92,10 @@
 <svg bind:this={svg} transition:fly|global={{y: 20, duration: 1500}} width={$clientX} height={$clientY} viewBox="0 0 {$clientX} {$clientY}">
     <g shape-rendering="auto" {transform}>
         {#each mapData as data}
-            <Country {data} {path} {strokeWidth} {...$$restProps} />
+            {#if data[0]?.geometry?.type !== 'Point'}
+                <Country {data} {path} {strokeWidth} {...$$restProps} />
+            {/if}
         {/each}
-
         {#if $showBorders}
             {#each countryBorders as border} 
                  <path 
@@ -107,7 +108,13 @@
                  />
             {/each}
         {/if}
-
+       
+        {#each mapData as data}
+            {#if data[0]?.geometry?.type === 'Point'}
+                <Country {data} {path} {strokeWidth} {...$$restProps} />
+            {/if}
+        {/each}
+        
                {#each mapData as data}
             {#if data[0]?.properties?.helper}
                 <CountryHelper {data} {path} {strokeWidth} {...$$restProps} />
