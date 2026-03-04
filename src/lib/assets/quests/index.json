@@ -16,7 +16,8 @@
     "id": "world-capitals",
     "name": "Capitals of the world",
     "objectsKey": "capitals",
-    "tags": [ "World" ],
+    "tags": [ "Africa", "North America", "South America", "Caribbean", "Asia", "Europe", "Oceania" 
+    ],
     "defaultTags": [ "World" ],
     "mapSource": "https://github.com/Stefie/geojson-world"
   },
