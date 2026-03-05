@@ -18,7 +18,7 @@
     "objectsKey": "capitals",
     "tags": [ "Africa", "North America", "South America", "Caribbean", "Asia", "Europe", "Oceania" 
     ],
-    "defaultTags": [ "World" ],
+    "defaultTags": [ "North America" ],
     "mapSource": "https://github.com/Stefie/geojson-world"
   },
   {
