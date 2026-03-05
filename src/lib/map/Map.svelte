@@ -74,8 +74,7 @@
             enableZoom()
         }
 
-        // Decode the map safely in the browser to prevent crashing
-        try {
+         try {
             const topoTool = topojson.default || topojson;
             const topoData = worldCountriesTopology.default || worldCountriesTopology;
             countryBorders = topoTool.feature(topoData, topoData.objects.countries).features;
