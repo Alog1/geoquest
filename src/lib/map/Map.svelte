@@ -53,7 +53,7 @@
     function centerMap() {
         scale = 0.95 / Math.max((bounds[1][0] - bounds[0][0]) / $clientX, (bounds[1][1] - bounds[0][1]) / $clientY)
         $projection.scale(scale).translate([($clientX - scale * (bounds[1][0] + bounds[0][0])) / 2, ($clientY - scale * (bounds[1][1] + bounds[0][1])) / 2])
-        path = getPath(scale) 
+        path = getPath(scale) // It's important to reset the path, otherwise an height change such as full screen might screw up the map
 
         if ($clientX < 800) d3Svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity)
     }
